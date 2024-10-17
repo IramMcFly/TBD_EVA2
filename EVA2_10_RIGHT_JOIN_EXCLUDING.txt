@@ -1,0 +1,264 @@
+
+C:\Users\iramb\OneDrive\Escritorio>mysqlsh
+MySQL Shell 8.0.38
+
+Copyright (c) 2016, 2024, Oracle and/or its affiliates.
+Oracle is a registered trademark of Oracle Corporation and/or its affiliates.
+Other names may be trademarks of their respective owners.
+
+Type '\help' or '\?' for help; '\quit' to exit.
+ MySQL  JS > \sql
+Switching to SQL mode... Commands end with ;
+ MySQL  SQL > \connect --mc root@localhost
+Creating a Classic session to 'root@localhost'
+Fetching global names for auto-completion... Press ^C to stop.
+Your MySQL connection id is 9
+Server version: 8.0.39 MySQL Community Server - GPL
+No default schema selected; type \use <schema> to set one.
+ MySQL  localhost:3306 ssl  SQL > use tbd_eva2
+Default schema set to `tbd_eva2`.
+Fetching global names, object names from `tbd_eva2` for auto-completion... Press ^C to stop.
+ MySQL  localhost:3306 ssl  tbd_eva2  SQL > SELECT a.nombre, a.apellidos, sum(c.cantidad * d.precio) as total FROM cliente a
+                                         ->                                          -> LEFT JOIN factura b on a.id = b.idCliente LEFT JOIN factura_detalle c ON
+                                         ->                                          -> b.folio = c.idfactura LEFT JOIN producto d ON d.id = c.idProducto GROUP BY a.id
+                                         ->                                          -> ORDER BY a.apellidos, a.nombre;
+ERROR: 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '-> LEFT JOIN factura b on a.id = b.idCliente LEFT JOIN factura_detalle c ON
+    ' at line 2
+ MySQL  localhost:3306 ssl  tbd_eva2  SQL > SELECT a.nombre, a.apellidos, sum(c.cantidad * d.precio) as total FROM cliente a
+                                         ->                                          LEFT JOIN factura b on a.id = b.idCliente LEFT JOIN factura_detalle c ON
+                                         ->                                          b.folio = c.idfactura LEFT JOIN producto d ON d.id = c.idProducto GROUP BY a.id
+                                         ->                                          ORDER BY a.apellidos, a.nombre;
++----------+------------+----------+
+| nombre   | apellidos  | total    |
++----------+------------+----------+
+| Juan     | Cochito    |    60.00 |
+| PEPE     | MACIAS     | 20120.00 |
+| Juan     | Pa         |     NULL |
+| oscar    | Raikkonnen |   100.00 |
+| Fernando | Tornello   |     NULL |
+| Max      | Versasen   | 15000.00 |
++----------+------------+----------+
+6 rows in set (0.0023 sec)
+ MySQL  localhost:3306 ssl  tbd_eva2  SQL > cmd
+                                         -> ^C
+ MySQL  localhost:3306 ssl  tbd_eva2  SQL > DESC producto;
++--------+---------------+------+-----+---------+----------------+
+| Field  | Type          | Null | Key | Default | Extra          |
++--------+---------------+------+-----+---------+----------------+
+| id     | int           | NO   | PRI | NULL    | auto_increment |
+| nombre | varchar(30)   | NO   |     | NULL    |                |
+| precio | decimal(10,2) | NO   |     | NULL    |                |
++--------+---------------+------+-----+---------+----------------+
+3 rows in set (0.0026 sec)
+ MySQL  localhost:3306 ssl  tbd_eva2  SQL > desc f
+factura          factura_detalle  FOR CONNECTION   FORMAT=
+ MySQL  localhost:3306 ssl  tbd_eva2  SQL > desc factura;
++-----------+------+------+-----+---------+----------------+
+| Field     | Type | Null | Key | Default | Extra          |
++-----------+------+------+-----+---------+----------------+
+| folio     | int  | NO   | PRI | NULL    | auto_increment |
+| idCliente | int  | NO   | MUL | NULL    |                |
++-----------+------+------+-----+---------+----------------+
+2 rows in set (0.0022 sec)
+ MySQL  localhost:3306 ssl  tbd_eva2  SQL > desc factura_detalle;
++------------+------+------+-----+---------+----------------+
+| Field      | Type | Null | Key | Default | Extra          |
++------------+------+------+-----+---------+----------------+
+| id         | int  | NO   | PRI | NULL    | auto_increment |
+| idfactura  | int  | NO   | MUL | NULL    |                |
+| idProducto | int  | NO   | MUL | NULL    |                |
+| cantidad   | int  | NO   |     | NULL    |                |
++------------+------+------+-----+---------+----------------+
+4 rows in set (0.0025 sec)                  desc factura;^C
+ MySQL  localhost:3306 ssl  tbd_eva2  SQL > SELECT a.id,a.nombre,c.cantidad FROM producto a LEFT JOIN factura_detalle ON
+ MySQL  localhost:3306 ssl  tbd_eva2  SQL >
+ MySQL  localhost:3306 ssl  tbd_eva2  SQL > SELECT a.id,a.nombre,c.cantidad FROM producto a LEFT JOIN
+                                         -> factura_detalle c ON a.id= c.idProducto GROUP BY a.id;
+ERROR: 1055 (42000): Expression #3 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'tbd_eva2.c.cantidad' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by
+ MySQL  localhost:3306 ssl  tbd_eva2  SQL > SELECT a.id,a.nombre,c.cantidad FROM producto a INNER JOIN factura_detalle c ON a.id= c.idProducto GROUP BY a.id;
+ERROR: 1055 (42000): Expression #3 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'tbd_eva2.c.cantidad' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by
+ MySQL  localhost:3306 ssl  tbd_eva2  SQL > SELECT b.nombre,a.cantidad FROM factura_detalle a LEFT JOIN producto b ON b.id = a.idProducto;
++--------+----------+
+| nombre | cantidad |
++--------+----------+
+| Nachos |      100 |
+| Helado |        4 |
+| Nachos |        2 |
+| iPhone |        1 |
+| iPhone |        1 |
+| Dogos  |        4 |
++--------+----------+
+6 rows in set (0.0010 sec)
+ MySQL  localhost:3306 ssl  tbd_eva2  SQL > SELECT b.nombre,a.cantidad FROM factura_detalle a LEFT JOIN producto b ON b.id = a.idProducto
+                                         -> GROUP BY a.idProducto;
+ERROR: 1055 (42000): Expression #2 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'tbd_eva2.a.cantidad' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by
+ MySQL  localhost:3306 ssl  tbd_eva2  SQL > SELECT b.nombre,a.cantidad FROM factura_detalle a LEFT JOIN producto b ON b.id = a.idProducto;
++--------+----------+
+| nombre | cantidad |
++--------+----------+
+| Nachos |      100 |
+| Helado |        4 |
+| Nachos |        2 |
+| iPhone |        1 |
+| iPhone |        1 |
+| Dogos  |        4 |
++--------+----------+
+6 rows in set (0.0008 sec)
+ MySQL  localhost:3306 ssl  tbd_eva2  SQL > SELECT a.nombre, a.apellidos, ifnull(sum(c.cantidad * d.precio)) as total FROM cliente a                                          LEFT JOIN factura b on a.id = b.idCliente LEFT JOIN factura_detalle c ON                                          b.folio = c.idfactura LEFT JOIN producto d ON d.id = c.idProducto GROUP BY a.id                                          ORDER BY a.apellidos, a.nombre;
+ERROR: 1582 (42000): Incorrect parameter count in the call to native function 'ifnull'
+ MySQL  localhost:3306 ssl  tbd_eva2  SQL > SELECT a.nombre, a.apellidos, ifnull(sum(c.cantidad * d.precio),0) as total FROM cliente a                                          LEFT JOIN factura b on a.id = b.idCliente LEFT JOIN factura_detalle c ON                                          b.folio = c.idfactura LEFT JOIN producto d ON d.id = c.idProducto GROUP BY a.id                                          ORDER BY a.apellidos, a.nombre;
++----------+------------+----------+
+| nombre   | apellidos  | total    |
++----------+------------+----------+
+| Juan     | Cochito    |    60.00 |
+| PEPE     | MACIAS     | 20120.00 |
+| Juan     | Pa         |     0.00 |
+| oscar    | Raikkonnen |   100.00 |
+| Fernando | Tornello   |     0.00 |
+| Max      | Versasen   | 15000.00 |
++----------+------------+----------+
+6 rows in set (0.0012 sec)
+ MySQL  localhost:3306 ssl  tbd_eva2  SQL > SELECT a.nombre, a.apellidos,d.nombre as Producto,c.cantidad, ifnull(sum(c.cantidad * d.precio),0) as total FROM cliente a                                          LEFT JOIN factura b on a.id = b.idCliente LEFT JOIN factura_detalle c ON                                          b.folio = c.idfactura LEFT JOIN producto d ON d.id = c.idProducto GROUP BY a.id                                          ORDER BY a.apellidos, a.nombre;
+ERROR: 1055 (42000): Expression #3 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'tbd_eva2.d.nombre' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by
+ MySQL  localhost:3306 ssl  tbd_eva2  SQL > SELECT b.nombre,ifnull(a.cantidad,0) FROM factura_detalle a LEFT JOIN producto b ON b.id = a.idProducto;
++--------+----------------------+
+| nombre | ifnull(a.cantidad,0) |
++--------+----------------------+
+| Nachos |                  100 |
+| Helado |                    4 |
+| Nachos |                    2 |
+| iPhone |                    1 |
+| iPhone |                    1 |
+| Dogos  |                    4 |
++--------+----------------------+
+6 rows in set (0.0009 sec)
+ MySQL  localhost:3306 ssl  tbd_eva2  SQL > SELECT b.nombre,ifnull((a.cantidad,0)) FROM factura_detalle a LEFT JOIN producto b ON b.id = a.idProducto;
+ERROR: 1582 (42000): Incorrect parameter count in the call to native function 'ifnull'
+ MySQL  localhost:3306 ssl  tbd_eva2  SQL > SELECT b.nombre,ifnull((a.cantidad),0) FROM factura_detalle a LEFT JOIN producto b ON b.id = a.idProducto;
++--------+------------------------+
+| nombre | ifnull((a.cantidad),0) |
++--------+------------------------+
+| Nachos |                    100 |
+| Helado |                      4 |
+| Nachos |                      2 |
+| iPhone |                      1 |
+| iPhone |                      1 |
+| Dogos  |                      4 |
++--------+------------------------+
+6 rows in set (0.0010 sec)
+ MySQL  localhost:3306 ssl  tbd_eva2  SQL > SELECT b.nombre,ifnull((a.cantidad),0)as cantidad FROM factura_detalle a LEFT JOIN producto b ON b.id = a.idProducto;
++--------+----------+
+| nombre | cantidad |
++--------+----------+
+| Nachos |      100 |
+| Helado |        4 |
+| Nachos |        2 |
+| iPhone |        1 |
+| iPhone |        1 |
+| Dogos  |        4 |
++--------+----------+
+6 rows in set (0.0010 sec)
+ MySQL  localhost:3306 ssl  tbd_eva2  SQL > SELECT b.nombre,ifnull((a.cantidad),0)as cantidad ifnull((a.cantidad * b.precio),0) FROM factura_detalle a LEFT JOIN producto b ON b.id = a.idProducto;
+ERROR: 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'ifnull((a.cantidad * b.precio),0) FROM factura_detalle a LEFT JOIN producto b ON' at line 1
+ MySQL  localhost:3306 ssl  tbd_eva2  SQL > SELECT b.nombre,ifnull((a.cantidad),0)as cantidad, ifnull((a.cantidad * b.precio),0) FROM factura_detalle a LEFT JOIN producto b ON b.id = a.idProducto;
++--------+----------+-----------------------------------+
+| nombre | cantidad | ifnull((a.cantidad * b.precio),0) |
++--------+----------+-----------------------------------+
+| Nachos |      100 |                           5000.00 |
+| Helado |        4 |                             60.00 |
+| Nachos |        2 |                            100.00 |
+| iPhone |        1 |                          15000.00 |
+| iPhone |        1 |                          15000.00 |
+| Dogos  |        4 |                            120.00 |
++--------+----------+-----------------------------------+
+6 rows in set (0.0011 sec)
+ MySQL  localhost:3306 ssl  tbd_eva2  SQL > SELECT b.nombre,ifnull((a.cantidad),0)as cantidad, ifnull((a.cantidad * b.precio),0)as total_vendido FROM factura_detalle a LEFT JOIN producto b ON b.id = a.idProducto;
++--------+----------+---------------+
+| nombre | cantidad | total_vendido |
++--------+----------+---------------+
+| Nachos |      100 |       5000.00 |
+| Helado |        4 |         60.00 |
+| Nachos |        2 |        100.00 |
+| iPhone |        1 |      15000.00 |
+| iPhone |        1 |      15000.00 |
+| Dogos  |        4 |        120.00 |
++--------+----------+---------------+
+6 rows in set (0.0010 sec)
+ MySQL  localhost:3306 ssl  tbd_eva2  SQL > DESC tablaa;
++--------+-------------+------+-----+---------+-------+
+| Field  | Type        | Null | Key | Default | Extra |
++--------+-------------+------+-----+---------+-------+
+| id     | int         | YES  |     | NULL    |       |
+| nombre | varchar(10) | YES  |     | NULL    |       |
++--------+-------------+------+-----+---------+-------+
+2 rows in set (0.0078 sec)
+ MySQL  localhost:3306 ssl  tbd_eva2  SQL > DESC tablab;
++--------+-------------+------+-----+---------+-------+
+| Field  | Type        | Null | Key | Default | Extra |
++--------+-------------+------+-----+---------+-------+
+| id     | int         | YES  |     | NULL    |       |
+| nombre | varchar(10) | YES  |     | NULL    |       |
++--------+-------------+------+-----+---------+-------+
+2 rows in set (0.0030 sec)
+ MySQL  localhost:3306 ssl  tbd_eva2  SQL > CREATE tablabb(
+                                         -> id int a^C
+ MySQL  localhost:3306 ssl  tbd_eva2  SQL > CREATE TABLE tablabb(
+                                         -> id INT KEY AUTO_INCREMENT,
+                                         -> idtablaa int,
+                                         -> nombre VARCHAR(50));
+Query OK, 0 rows affected (0.0632 sec)
+ MySQL  localhost:3306 ssl  tbd_eva2  SQL > INSERT INTO tablabb(idtablaa,nombre) values
+                                         -> (1,"xxxx"),(2,"yyyy"),(2,"zzzzz"),(3,"dddd")
+                                         -> ,(null,"rrrr"),(null,"tttt");
+Query OK, 6 rows affected (0.0494 sec)
+
+Records: 6  Duplicates: 0  Warnings: 0
+ MySQL  localhost:3306 ssl  tbd_eva2  SQL > SELECT a.nombre, b.nombre FROM tablaa a LEFT JOIN
+                                         -> tablabb b ON a.id = b.idtablaa;
++--------+--------+
+| nombre | nombre |
++--------+--------+
+| A      | xxxx   |
+| B      | zzzzz  |
+| B      | yyyy   |
+| C      | dddd   |
+| D      | NULL   |
++--------+--------+
+5 rows in set (0.0025 sec)
+ MySQL  localhost:3306 ssl  tbd_eva2  SQL > SELECT a.nombre, b.nombre FROM tablaa a RIGHT JOIN  tablabb b ON a.id = b.idtablaa;
++--------+--------+
+| nombre | nombre |
++--------+--------+
+| A      | xxxx   |
+| B      | yyyy   |
+| B      | zzzzz  |
+| C      | dddd   |
+| NULL   | rrrr   |
+| NULL   | tttt   |
++--------+--------+
+6 rows in set (0.0009 sec)
+ MySQL  localhost:3306 ssl  tbd_eva2  SQL > SELECT a.nombre, a.apellidos, b.folio FROM cliente a LEFT JOIN factura b
+                                         -> on a.id = b.idCliente;
++----------+------------+-------+
+| nombre   | apellidos  | folio |
++----------+------------+-------+
+| PEPE     | MACIAS     |    11 |
+| PEPE     | MACIAS     |    12 |
+| PEPE     | MACIAS     |    13 |
+| PEPE     | MACIAS     |    14 |
+| Juan     | Cochito    |    15 |
+| oscar    | Raikkonnen |    16 |
+| Max      | Versasen   |    17 |
+| Juan     | Pa         |  NULL |
+| Fernando | Tornello   |    18 |
++----------+------------+-------+
+9 rows in set (0.0011 sec)
+ MySQL  localhost:3306 ssl  tbd_eva2  SQL > SELECT a.nombre, a.apellidos, b.folio FROM cliente a LEFT JOIN factura b on a.id = b.idCliente
+                                         -> WHERE b.folio is NULL;
++--------+-----------+-------+
+| nombre | apellidos | folio |
++--------+-----------+-------+
+| Juan   | Pa        |  NULL |
++--------+-----------+-------+
+1 row in set (0.0010 sec)
+ MySQL  localhost:3306 ssl  tbd_eva2  SQL >
